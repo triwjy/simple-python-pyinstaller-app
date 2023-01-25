@@ -19,7 +19,11 @@ node {
         }
     }
 
-    stage('Deliver') {
+    stage('Manual Approval') {
+        input(message: "Lanjutkan ke tahap Deploy?")
+    }
+
+    stage('Deploy') {
         withEnv(['VOLUME=$(pwd)/sources:/src',
             'IMAGE=cdrx/pyinstaller-linux:python2']) {
             try {
@@ -33,7 +37,9 @@ node {
             } finally {
                 archiveArtifacts "${env.BUILD_ID}/sources/dist/add2vals"
                 sh "docker run --rm -v ${VOLUME} ${IMAGE} 'rm -rf build dist'"
+                echo "waiting for 60 s"
+                sleep(60)
             }
         }
     }
-}
+}   
